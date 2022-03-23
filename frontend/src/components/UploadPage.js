@@ -73,7 +73,7 @@ export default function UploadPage(props) {
             .then((response) => {
                 if(response.status==200){
                 setError("")
-                console.log(response.data);
+                //console.log(response.data);
                 // go to session page using the code and transfer the data with it
                 navigate('/session/' + response.data.session_code,
                 {state : {

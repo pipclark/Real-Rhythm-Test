@@ -88,7 +88,7 @@ u
     .duration(300)
         .attr("x", 1)
         .attr("transform", function(d) { return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
-        .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) -1 ; })
+        .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0); }) // add a eg -1 at the end of the scale if you want a space between bars
         .attr("height", function(d) { return height - yScale(d.length); })
         .style("fill", "lightBlue")
         .style("opacity", "0.7")

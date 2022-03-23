@@ -43,7 +43,7 @@ export default function SessionPage(props) {
     const [startTime, setStartTime] = useState(0)
     const [endTime, setEndTime] = useState(startTime+timeWindow)
     // variable parameters for note onset detection
-    const [threshold, setThreshold] = useState(0)
+    const [threshold, setThreshold] = useState(maxval/10)
     const [indexBehind1, setIndexBehind1] = useState(5)
     const [indexBehind2, setIndexBehind2] = useState(25)
 
