@@ -1,0 +1,256 @@
+import React, { Component, useState } from "react";
+import { Grid, Button, Typography, FormControl, FormHelperText, 
+    FormControlLabel, RadioGroup, Radio, TextField, Box } from '@material-ui/core';
+import axios from 'axios';
+import { withRouter } from './withRouter';
+
+export default class UploadPage extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            username: "",
+            title: "",
+            tempo: "",
+            selectedFile: null,
+            fileName: "no file selected",
+            error: "",
+            errorTempo: "",
+            errorName: "",
+        }
+
+        this.selectFile = this.selectFile.bind(this);
+        this.handleTempoChange = this.handleTempoChange.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.uploadButtonPressed = this.uploadButtonPressed.bind(this);
+    }
+
+    
+
+    selectFile(e) {
+        this.setState({
+          selectedFile: e.target.files[0],
+          fileName: e.target.files[0].name,
+        });
+    }
+
+    
+
+    handleTempoChange(e) {
+        this.setState({
+            tempo: e.target.value,
+        })
+    }
+
+      
+    handleNameChange(e) {
+        this.setState({
+            username: e.target.value,
+        });
+    }
+
+    handleTitleChange(e) {
+        this.setState({
+            title: e.target.value,
+        });
+    }
+
+    uploadButtonPressed() {
+        if (!this.state.tempo == "" && 20 > this.state.tempo || 300 < this.state.tempo){
+            this.setState({
+                errorTempo: "tempo outside of range (20-300)",
+                tempo: "", // don't pass the bad value along
+            })
+        } else { this.setState({
+            errorTempo: ""
+        })
+        }
+        if (this.state.username === "") {
+            this.setState({
+                errorName: "Please enter your name"
+            })
+            return
+        }
+        if (this.state.selectedFile == null) {
+            this.setState({
+                error: "No file chosen for upload"
+            })    
+            return
+        }
+        console.log(this.state.selectedFile.type)
+        if (this.state.selectedFile.type != "audio/wav"){
+            this.setState({
+                error: "File is not a .wav file"
+            })    
+            console.log('hey')
+            return
+        }
+
+        let uploadData = new FormData();
+        //console.log(this.state.uploadFile)
+        uploadData.append('username', this.state.username);
+        uploadData.append('title', this.state.title);
+        uploadData.append('tempo', this.state.tempo);
+        uploadData.append('file', this.state.selectedFile); // this.state.username, this.state.title, this.state.tempo,
+        
+        // now post it
+        var $csrf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+
+        axios.post('/api/upload', uploadData, {
+            headers: {
+                'content-type': 'multipart/form-data'
+            }
+        })
+            .then((response) => {
+                if(response.status==200){
+                this.setState({error: ""})
+                console.log(response.data);
+                this.props.navigate('/session/' + response.data.session_code); 
+                } else {
+                    this.setState({error: "Problem with uploading File"})
+                }
+              })
+            
+            .catch(err => console.log(err))
+
+        /*
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            body: JSON.stringify({
+                'username': this.state.username,
+                'title': this.state.title,
+                'tempo': this.state.tempo,
+                'file': this.state.selectedFile,
+            })
+        };
+
+        console.log(requestOptions)
+        fetch('/api/upload', requestOptions).then((response) => {
+            if (response.ok) {
+                this.props.navigate(`/session`) 
+            } else {
+                this.setState({error: "File not successfully uploaded."})
+            }
+        }).catch((error) => {
+            console.log(error);
+        });*/
+    };
+
+        
+    
+
+
+render() {
+
+    return (
+        <Grid container spacing={3} align="center">
+
+        <Grid item xs={12}>
+            <Typography variant="h4" compact="h4">
+                Upload your .wav file for rhythm analysis
+            </Typography>
+        </Grid>
+        <Grid item xs={12}>
+        <FormControl component="fieldset">
+        <label htmlFor="btn-upload">
+          <input
+            id="btn-upload"
+            name="btn-upload"
+            style={{ display: 'none' }}
+            type="file"
+            onChange={this.selectFile} />
+          <Button
+            className="btn-choose"
+            variant="outlined"
+            component="span" >
+             Choose .wav File
+          </Button>
+          <FormHelperText>
+                <div align="center">
+                    {this.state.fileName}</div>
+            </FormHelperText>
+        </label>
+        </FormControl> 
+        </Grid>
+
+        <Grid item xs={12}>
+        <FormControl>
+            <TextField 
+            required={false} 
+            type="number" 
+            defaultValue=""
+            onChange={this.handleTempoChange}
+            helperText={this.state.errorTempo}  
+            error={this.state.errorTempo} 
+            inputProps={{
+                style: {textAlign: "center"},
+                min: 20,
+            }}
+            />
+            <FormHelperText>
+                <div align="center">
+                    Tempo (only if known)</div>
+            </FormHelperText>
+        </FormControl> 
+        </Grid>
+        
+        <Grid item xs={12}>
+        <FormControl>
+            <TextField 
+            required={true} 
+            type="text" 
+            defaultValue=""
+            onChange={this.handleNameChange}
+            helperText={this.state.errorName}  
+            error={this.state.errorName}  
+            inputProps={{
+                style: {textAlign: "center"},
+            }}
+            />
+            <FormHelperText>
+                <div align="center">
+                    Your Name</div>
+            </FormHelperText>
+        </FormControl> 
+        </Grid>
+
+        <Grid item xs={12}>
+        <FormControl>
+            <TextField 
+            required={false} 
+            type="text" 
+            defaultValue=""
+            onChange={this.handleTitleChange}
+            inputProps={{
+                style: {textAlign: "center"},
+            }}
+            />
+            <FormHelperText>
+                <div align="center">
+                    Music Title (optional)</div>
+            </FormHelperText>
+        </FormControl> 
+        </Grid>
+        
+        <Grid item xs={12}>
+        <Button color="primary" variant="contained" onClick={this.uploadButtonPressed}> 
+            Upload
+        </Button>    
+        <Grid item xs={12}>
+            <p className="uploadFileError">{this.state.error}</p>
+        </Grid>
+        </Grid>
+        </Grid>
+
+
+
+    )
+}
+
+
+
+}

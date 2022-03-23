@@ -1,0 +1,28 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /*color: white;*/
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.uploadFileError {
+    color: red;
+}
+
+#threshold-slider {
+    color: orange;
+}
+
+.logo {
+    width: auto;
+    height: auto;
+    max-height: 72px;
+    max-width: 150px;
+}
