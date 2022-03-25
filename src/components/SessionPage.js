@@ -89,11 +89,29 @@ export default function SessionPage(props) {
                 setNoteOnsetObject(JSON.parse(response.data.note_onsets_obj));
                 setCalculatingNoteOnsets(false);
             } else { 
-                setError("Problem with Calculating Note Onsets");               
+                setError("Problem with Calculating Note Onsets");   
+                setCalculatingNoteOnsets(false);            
                 }
             })
 
-            .catch(err => console.log(err))
+            .catch(function (err) {
+                console.log(err)
+                if (err.response){
+                // Request made and server responded
+                    console.log(err.response)
+                    setError("Server error in calculating notes. Try changing threshold or use a smaller file.");
+                    setCalculatingNoteOnsets(false)
+                } else if (error.request) {
+                // The request was made but no response was received
+                    console.log(error.request);
+                    setError("No response from the server. Possible time out, try a higher threshold value or a shorter file.");
+                    setCalculatingNoteOnsets(false)
+                } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+                setCalculatingNoteOnsets(false)
+                }
+            })
     }
 
     const [beatNos, setBeatNos] = useState([]);
@@ -137,11 +155,13 @@ export default function SessionPage(props) {
                     waveDataJSON: waveDataJSON,
                     averager: averager,
                 }}); 
-            } else if (response.status==422) { // axios .then can only catch 2xx codes so this is pointless currently
+            } /*else if (response.status==422) { // axios .then can only catch 2xx codes so this is pointless currently
                 setError("Required to Calculate Note Onsets first");
-            } else { 
+                setAnalysingRhythm(false);
+            }*/ else { 
                 console.log('error')
-                setError("Problem with Calculating Note Onsets");               
+                setAnalysingRhythm(false);
+                setError("Problem Analysing Rhyth, try calculating note onsets first");    
             }
         })
 
@@ -150,13 +170,16 @@ export default function SessionPage(props) {
             if (err.response){
             // Request made and server responded
                 setError("Try calculating note onsets before analysing your rhythm");
+                setAnalysingRhythm(false)
             } else if (error.request) {
             // The request was made but no response was received
                 console.log(error.request);
-                setError("No response from the server");
+                setError("No response from the server. Possible Time out. Try a smaller file/less notes.");
+                setAnalysingRhythm(false)
             } else {
             // Something happened in setting up the request that triggered an Error
             console.log('Error', error.message);
+            setAnalysingRhythm(false)
             }
         })
     }
@@ -371,7 +394,7 @@ export default function SessionPage(props) {
         </Grid>
 
         <Grid item xs={12}>
-            <Typography variant="h5">{error}</Typography>
+            <Typography className="errorText" variant="h5">{error}</Typography>
         </Grid>
 
         </Grid>

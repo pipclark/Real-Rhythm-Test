@@ -68,6 +68,10 @@ cover/
 # Translations
 *.mo
 
+# node stuff
+frontend/static/frontend/main.js
+frontend/static/frontend/main.js.LICENSE.txt
+
 # Django stuff:
 
 # Flask stuff:
@@ -159,3 +163,28 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+
+# Created by https://www.toptal.com/developers/gitignore/api/react
+# Edit at https://www.toptal.com/developers/gitignore?templates=react
+
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+# End of https://www.toptal.com/developers/gitignore/api/react
+
+#uploads on computer when running local
+api/static/uploads

@@ -74,8 +74,9 @@ class UploadView(APIView):
                 analysis_session.wav_data_json = wav_data_json
                 analysis_session.averager = averager
                 analysis_session.wav_data_json = wav_data_json
+                analysis_session.note_onsets_json = {}
                 analysis_session.save(update_fields=['username', 'title', 'tempo', 'rate',
-                                                     'wav_data_json', 'averager', 'filepath'])
+                                                     'wav_data_json', 'averager', 'filepath', 'note_onsets_json'])
                 self.request.session['session_code'] = analysis_session.session_code  # keep old session code
             # new user
             else:

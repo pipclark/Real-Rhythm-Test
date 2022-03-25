@@ -26,3 +26,7 @@ html, body {
     max-height: 72px;
     max-width: 150px;
 }
+
+.errorText {
+    color: red;
+}

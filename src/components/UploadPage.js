@@ -87,7 +87,7 @@ export default function UploadPage(props) {
                 }}); 
                 //{username, title, tempo, waveData, sampleRate}); 
             } else { 
-                setError("Problem with uploading File");
+                setError("Problem with uploading File. Try a smaller file or compressing your file.");
                 return 
                 }
             })

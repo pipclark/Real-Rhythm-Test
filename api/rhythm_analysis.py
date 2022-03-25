@@ -60,11 +60,20 @@ def json_numpy_load(json_object):
     return np_array
 
 
-def average_out_array(np_array, avg_num=1):
+def average_out_array_positives(np_array, avg_num=1):
     # taking off any data at the end that allows it to be divisible into avg_num
     chopendfrom = len(np_array) % avg_num
-    np_avg = np.mean(np_array[:-chopendfrom].reshape(-1, avg_num), axis=1)
-    return np_avg
+    # separate positive and negative parts of the wave so averaging doesn't cancel them out
+    np_pos = np.copy(np_array)
+    np_pos[np_pos < 0] = 0
+    np_pos_avg = np.mean(np_pos[:-chopendfrom].reshape(-1, avg_num), axis=1)
+    #np_neg = np.copy(np_array)
+    #np_neg[np_neg > 0] = 0
+    #np_neg_avg = np.mean(np_neg[:-chopendfrom].reshape(-1, avg_num), axis=1)
+
+    #np_avg = np_neg_avg + np_pos_avg
+    # in the end the nicest way to display the data is to take the positive
+    return np_pos_avg
 
 
 def handle_uploaded_file(f):
@@ -81,7 +90,7 @@ def handle_uploaded_file(f):
 
     # going to also average it out JS so that react / d3 can render more time for less data points
     averager = 1000
-    wave_data_json = json_numpy(average_out_array(wav_data.data, avg_num=averager))
+    wave_data_json = json_numpy(average_out_array_positives(wav_data.data, avg_num=averager))
 
     return wave_data_json, averager, (storage_path + f.name), wav_data.rate
 
@@ -97,7 +106,7 @@ def calculate_note_onsets(filepath, threshold, sample_rate, averager):
 
     # find threshold
     # averaged data used in JS actually has a different max value so need to rescale the threshold
-    averaged_wave_data = average_out_array(wave_data, int(averager))
+    averaged_wave_data = average_out_array_positives(wave_data, int(averager))
     threshold_max_fraction = float(threshold)/np.amax(averaged_wave_data)
     print(f'threshold is set at {threshold_max_fraction} of max ampltiude.')
     amplitude_threshold = threshold_function(array=wave_data, fraction=threshold_max_fraction, avg_size=1000)
@@ -116,7 +125,7 @@ def calculate_note_onsets(filepath, threshold, sample_rate, averager):
     # function with 0s and values only where note onset times are
     show_note_onsets = ones_on_note_onsets(new_notes, wave_data, int(sample_rate), np.amax(wave_data)*int(averager))
 
-    show_note_onsets_averaged = average_out_array(show_note_onsets, 1000)
+    show_note_onsets_averaged = average_out_array_positives(show_note_onsets, 1000)
 
     print('note showing function created')
     #figure out how to json new_notes ( notes class that i made)
@@ -168,7 +177,7 @@ def write_over_last_note(peaks, notes, i):
 
 def find_note_onsets(peaks, all_peaks, threshold, time_indist):
     notes_onset = notes([0], [0], [0], [0])
-    for i in range(5, len(peaks.amp) - 1):
+    for i in range(1, len(peaks.amp) - 1):
         ii = find_nearest(all_peaks.time, peaks.time[i])
         # if previous part of wave was not below threshold
         if not all(all_peaks.amp[ii - 25:ii - 5] < threshold):
