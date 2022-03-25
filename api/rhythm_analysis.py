@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from math import isclose, pi
 import pickle, base64
 import json
+from pathlib import Path
 
 class peaks:
     def __init__(self, time, index, amp):
@@ -82,6 +83,7 @@ def handle_uploaded_file(f):
     #    t = 0
     storage_path = 'api/static/uploads/'
     # save file
+    Path(storage_path).mkdir(parents=True, exist_ok=True) # make storage path if does not exist
     with open(storage_path + f.name, 'wb+') as destination:
         for chunk in f.chunks():  # writing in chunks in case file is huge
             destination.write(chunk)
