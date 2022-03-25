@@ -179,7 +179,7 @@ def write_over_last_note(peaks, notes, i):
 
 def find_note_onsets(peaks, all_peaks, threshold, time_indist):
     notes_onset = notes([0], [0], [0], [0])
-    for i in range(1, len(peaks.amp) - 1):
+    for i in range(0, len(peaks.amp) - 1):
         ii = find_nearest(all_peaks.time, peaks.time[i])
         # if previous part of wave was not below threshold
         if not all(all_peaks.amp[ii - 25:ii - 5] < threshold):
