@@ -332,19 +332,25 @@ def estimate_tempo_from_mode(note_spacings):
     # std_dev_of_mode = np.std(mode_array)
     Tempo = 60 / mean_of_mode
 
+    # calculate smallest division (occuring at least 4 times to be sure it's deliberate)
+    smallest_division = 1
+    for s in [2, 4, 8]:
+        n = 0
+        perfect_spacing = mean_of_mode / s
+
+        for space in note_spacings[2:]:
+            if np.allclose(perfect_spacing, space, rtol=perfect_spacing * 0.1):
+                n += 1
+        if n > 4:
+            smallest_division = s
+
     # don't want Tempo to be set at some unreasonably higher never used value so:
     while Tempo > 251:
         Tempo /= 2
+        smallest_division *= 2
 
-    smallestdivision = 1
-    for s in [2, 4, 8]:
-        if any(mean_of_mode / s * 0.95 <= space <= mean_of_mode / s * 1.05
-               for space in note_spacings[2:]):
-            smallestdivision = s
-
-
-    print(Tempo, smallestdivision)
-    return Tempo, smallestdivision
+    print(Tempo, smallest_division)
+    return Tempo, smallest_division
 
 
 def analyse_rhythm(tempo, new_notes, user_set_tempo, smallestdivision):
