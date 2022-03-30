@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Grid, Button, Typography, FormControl, FormHelperText, 
-    FormControlLabel, RadioGroup, Radio, TextField, Box } from '@mui/material';
+    FormControlLabel, RadioGroup, Radio, TextField, Box, Popover } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
@@ -37,6 +37,20 @@ export default function UploadPage(props) {
     const handleTitleChange = (e) => {
             setTitle(e.target.value)
     }
+
+    // for the instructions pop over
+        const [anchorEl, setAnchorEl] = React.useState(null);
+        const handleInstructionsClick = (event) => {
+          setAnchorEl(event.currentTarget);
+        };
+      
+        const handleInstructionsClose = () => {
+          setAnchorEl(null);
+        };
+      
+        const instructionsOpen = Boolean(anchorEl);
+        const instruction = instructionsOpen ? 'simple-popover' : undefined;
+      
 
     const uploadButtonPressed = () => {
         console.log(selectedFile.type)
@@ -108,6 +122,33 @@ export default function UploadPage(props) {
                 Upload your .wav or .mp3 file for rhythm analysis
             </Typography>
         </Grid>
+
+        <Grid item align="left" xs={10}>
+            <Button aria-describedby={instruction} variant="contained" onClick={handleInstructionsClick}>
+            Instructions
+            </Button>
+            <Popover
+            id={instruction}
+            open={instructionsOpen}
+            anchorEl={anchorEl}
+            onClose={handleInstructionsClose}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+            }}
+            >
+            
+            <Typography sx={{ p: 2 }} variant="h6" compact="h6">
+            Choose a .wav or .mp3 file for upload</Typography>
+            <Typography sx={{ p: 2 }}>Real Rhythm Test works best if you upload a recording of just one instrument, 
+            rather than a mix of a whole band. Other wise it can be difficult to detect the onsets of new notes.</Typography>
+            <Typography sx={{ p: 2 }}>After choosing your music file, fill in the Tempo if you played to a metronome/click, 
+            or leave it blank if you played without or do not know the tempo,
+             add your name (mandatory) and the title of your track if you have one (optional). </Typography>
+             <Typography sx={{ p: 2 }}>When you're ready, press UPLOAD to proceed.</Typography>
+            </Popover>
+        </Grid>
+
         <Grid item xs={12}>
         <FormControl component="fieldset">
         <label htmlFor="btn-upload">
@@ -191,7 +232,7 @@ export default function UploadPage(props) {
         </Grid>
         
         <Grid item xs={12}>
-        <Button color="primary" variant="contained" onClick={uploadButtonPressed}> 
+        <Button color="secondary" variant="contained" onClick={uploadButtonPressed}> 
             Upload
         </Button>    
         <Grid item xs={12}>

@@ -377,6 +377,11 @@ def estimate_tempo_from_mode(note_spacings):
         Tempo /= 2
         smallest_division *= 2
 
+    # likewise don't want it to be unreasonably low
+    while Tempo < 50:
+        Tempo *= 2
+        smallest_division /= 2
+
     print(Tempo, smallest_division)
     return Tempo, smallest_division
 
