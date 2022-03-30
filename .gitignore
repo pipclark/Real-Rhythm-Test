@@ -188,3 +188,6 @@ sketch
 
 #uploads on computer when running local
 api/static/uploads
+
+#FFmpeg on computer
+FFmpeg

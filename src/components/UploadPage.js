@@ -39,6 +39,7 @@ export default function UploadPage(props) {
     }
 
     const uploadButtonPressed = () => {
+        console.log(selectedFile.type)
         if (!tempo == "" && 20 > tempo || 300 < tempo){
                 setErrorTempo("tempo outside of range (20-300)");
                 setTempo("") // don't pass the bad value along
@@ -51,8 +52,8 @@ export default function UploadPage(props) {
                 setError("No file chosen for upload")
             return
         }
-        if (selectedFile.type != "audio/wav"){
-                setError("File is not a .wav file");
+        if (selectedFile.type != "audio/wav" && selectedFile.type != "audio/mpeg"){
+                setError("File is not a .wav or .mp3 file");
             return
         }
 
@@ -104,7 +105,7 @@ export default function UploadPage(props) {
 
         <Grid item xs={12}>
             <Typography variant="h4" compact="h4">
-                Upload your .wav file for rhythm analysis
+                Upload your .wav or .mp3 file for rhythm analysis
             </Typography>
         </Grid>
         <Grid item xs={12}>
@@ -120,7 +121,7 @@ export default function UploadPage(props) {
             className="btn-choose"
             variant="outlined"
             component="span" >
-             Choose .wav File
+             Choose File
           </Button>
           <FormHelperText>
                 <div align="center">

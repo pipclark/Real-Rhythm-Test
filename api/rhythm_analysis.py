@@ -8,6 +8,8 @@ from math import isclose, pi
 import pickle, base64
 import json
 from pathlib import Path
+import pydub
+
 
 class peaks:
     def __init__(self, time, index, amp):
@@ -87,8 +89,34 @@ def handle_uploaded_file(f):
     with open(storage_path + f.name, 'wb+') as destination:
         for chunk in f.chunks():  # writing in chunks in case file is huge
             destination.write(chunk)
+    print('uploaded file saved')
 
+    #convert .mp3 to .wav
+    if '.mp3' in f.name:
+        print('.mp3 file detected, about to convert')
+        #pydub.AudioSegment.converter = r"C:\FFmpeg\bin\ffmpeg.exe"  # for home server
+        #print('FFmpeg path set')
+        sound = pydub.AudioSegment.from_mp3(storage_path + f.name)
+        print('yay')
+        # convert to .wav
+        f.name = f.name.replace('.mp3', '.wav')
+        print(f'new name: {f.name}')
+        sound.export(storage_path + f.name, format="wav")
+        print('mp3 successfully converted to .wav')
+
+    #read in wav data
     wav_data = wavio.read(storage_path + f.name)
+
+    # convert stereo to mono
+    try:
+        if len(wav_data.data[1]) > 1:
+            wav_data.data = wav_data.data.sum(axis=1) / len(wav_data.data[1])
+            wavio.write(storage_path + f.name, wav_data.data, wav_data.rate, sampwidth=wav_data.sampwidth)
+            print('.wav file converted to a mono track')
+            wav_data = wavio.read(storage_path + f.name)
+    except TypeError:
+        pass  # when track was already mono
+
 
     # going to also average it out JS so that react / d3 can render more time for less data points
     averager = 1000
@@ -98,12 +126,12 @@ def handle_uploaded_file(f):
 
 
 def calculate_note_onsets(filepath, threshold, sample_rate, averager):
-    #decode wave data
+    # decode wave data
     wave_data = wavio.read(filepath)
     wave_data = wave_data.data
 
-    #make time data
-    time_indist = 40E-3  #ms, indistinguishable time (difference can't be detected) maybe make this a variable parameter in ui
+    # make time data
+    time_indist = 40E-3  # ms, indistinguishable time (difference can't be detected) maybe make this a variable parameter in ui
     print('time data set')
 
     # find threshold
