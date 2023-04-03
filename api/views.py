@@ -1,44 +1,10 @@
-import base64
-
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import UploadPackageSerializer, AnalysisSessionSerializer, NoteOnsetCalculatorSerializer, AnalysisSessionAnalyseSerializer
-from .models import UploadPackage, AnalysisSession, NoteOnsetCalculator
-from .forms import UploadFileForm
+from .models import UploadPackage, AnalysisSession
 from .rhythm_analysis import handle_uploaded_file, calculate_note_onsets, generate_rhythm_analysis
-import json
-from django.views.decorators.csrf import csrf_exempt
-
-
-# Create your views here.
-# def index(request):
-#    return render(request, 'api/index.html')
-
-# class AnalysisSessionView(generics.ListAPIView):
-#    queryset = Analysis_Session.objects.all()
-#    serializer_class = Analysis_SessionSerializer
-
-
-# def index(request):
-#     if request.method == 'POST':
-#         form = UploadFileForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             print('file valid')
-#             handle_uploaded_file(request.FILES['file'],request.POST['tempo'])
-#             #return HttpResponseRedirect('/success/url/')
-#             return render(request, 'api/upload.html') #HttpResponse("File Uploaded Successfully")
-#         else:
-#             form = UploadFileForm()
-#             print('form not valid')
-#             #return HttpResponse("File Not Uploaded Successfully")
-#             return render(request, 'api/index.html',{'form': form})
-#     else:
-#         form = UploadFileForm()
-#         return render(request, 'frontend/templates/index.html', {'form': form}) # needed for auto filling the HTML
 
 
 class UploadView(APIView):
@@ -88,7 +54,6 @@ class UploadView(APIView):
 
             return Response(AnalysisSessionSerializer(analysis_session).data, status=status.HTTP_200_OK)
         print('upload not valid')
-        # print(serializer.data.get('file'))
 
         return Response({'Bad Request': 'Upload data Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -123,8 +88,6 @@ class CalculateNoteOnsets(APIView):
                 analysis_session.note_onsets_json = note_onsets_json # ADD IN ONCE JSONified
                 analysis_session.threshold = threshold
                 analysis_session.save(update_fields=['note_onsets_json', 'threshold'])
-                #show_note_onsets_json = json.dumps(show_note_onsets)
-                #analysis_session.save(update_fields=['note_onsets_json']) # ADD BACK IN AS ABOVE
                 return Response({"note_onset_data": show_note_onsets_json,
                                  "note_onsets_obj": note_onsets_json
                                  }, status=status.HTTP_200_OK)
@@ -132,6 +95,7 @@ class CalculateNoteOnsets(APIView):
             return Response({'Bad Request': 'Analysis session does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'Bad Request': 'Data sent invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AnalyseRhythm(APIView):
     serializer_class = AnalysisSessionAnalyseSerializer
